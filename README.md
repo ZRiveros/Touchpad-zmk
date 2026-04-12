@@ -1,17 +1,17 @@
 # Standalone BLE Touchpad — ZMK Firmware
 
-Fristående Bluetooth-touchpad med HolyKeebs TPS43 + NRF52840 SuperMini.
-Fungerar som en separat BLE-enhet, **inte** kopplad till Aurora Sofle v2.
+Standalone Bluetooth touchpad using HolyKeebs TPS43 + NRF52840 SuperMini.
+Works as a separate BLE device, **not** connected to Aurora Sofle v2.
 
-## Hårdvara
+## Hardware
 
-| Komponent | Beskrivning |
+| Component | Description |
 |---|---|
-| NRF52840 SuperMini | nice!nano v2-kompatibel MCU |
+| NRF52840 SuperMini | nice!nano v2-compatible MCU |
 | HolyKeebs TPS43 kit | Azoteq IQS5xx touchpad + adapter PCB |
-| LiPo-batteri | Valfritt, för trådlös drift |
+| LiPo battery | Optional, for wireless operation |
 
-## Kopplingsschema
+## Wiring Diagram
 
 ```
 TPS43 adapter PCB         NRF52840 SuperMini
@@ -20,35 +20,35 @@ VCC  ──────────────────►  VCC  (3.3V)
 GND  ──────────────────►  GND
 SDA  ──────────────────►  D2   (P0.17)
 SCL  ──────────────────►  D3   (P0.20)
-RDY  ──────────────────►  D4   (P0.22)   ← OBS: Krävs!
+RDY  ──────────────────►  D4   (P0.22)   ← NOTE: Required!
 ```
 
-> **Viktigt:** Du behöver **5 kablar**, inte 4! RDY-pinnen (Data Ready) är
-> obligatorisk — drivrutinen använder den som interrupt för att veta
-> när ny data finns tillgänglig från touchpaden.
+> **Important:** You need **5 wires**, not 4! The RDY pin (Data Ready) is
+> mandatory — the driver uses it as an interrupt to know
+> when new data is available from the touchpad.
 
-### Valfritt: RESET
+### Optional: RESET
 
-Om du vill koppla touchpadens RESET-pin, anslut den till **D5 (P0.24)**
-och avkommentera `reset-gpios`-raden i `touchpad.overlay`.
+If you want to connect the touchpad's RESET pin, wire it to **D5 (P0.24)**
+and uncomment the `reset-gpios` line in `touchpad.overlay`.
 
-### Om du använder adapter-PCB:et
+### Using the Adapter PCB
 
-HolyKeebs adapter PCB:t sitter normalt på Pro Micro-headern via
-FFC-kabeln. De 4 lödpunkterna på adaptern ger signalerna som mappas
-till Pro Micro-pinnarna. Kontrollera vilka pins adaptern router
-SDA, SCL och RDY till — de bör matcha D2, D3 och en av de närliggande
-pinnarna. Annars kan du löda direkt från FFC-breakout till MCU:n.
+The HolyKeebs adapter PCB normally sits on the Pro Micro header via
+the FFC cable. The 4 solder points on the adapter provide the signals
+that map to the Pro Micro pins. Verify which pins the adapter routes
+SDA, SCL, and RDY to — they should match D2, D3, and one of the
+adjacent pins. Otherwise, you can solder directly from the FFC breakout to the MCU.
 
-## Bygga firmware
+## Building Firmware
 
-### Via GitHub Actions (rekommenderat)
+### Via GitHub Actions (recommended)
 
-1. Pusha detta repo till GitHub
-2. GitHub Actions bygger automatiskt
-3. Ladda ner `touchpad-firmware` artifact (`.uf2`-fil)
+1. Push this repo to GitHub
+2. GitHub Actions builds automatically
+3. Download the `touchpad-firmware` artifact (`.uf2` file)
 
-### Lokalt
+### Locally
 
 ```bash
 west init -l config
@@ -56,35 +56,35 @@ west update
 west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=touchpad -DZMK_CONFIG="$(pwd)/config"
 ```
 
-## Flasha
+## Flashing
 
-1. Dubbelklicka RESET-knappen på NRF52840 SuperMini för att gå till bootloader
-2. En USB-enhet `NICENANO` (eller `NRF52BOOT`) dyker upp
-3. Kopiera `.uf2`-filen dit
+1. Double-click the RESET button on the NRF52840 SuperMini to enter bootloader
+2. A USB device `NICENANO` (or `NRF52BOOT`) will appear
+3. Copy the `.uf2` file to it
 
-## Använda
+## Usage
 
-Enheten annonserar sig som **"Touchpad"** via Bluetooth.
+The device advertises as **"Touchpad"** via Bluetooth.
 
-1. Slå på enheten (USB-C eller LiPo)
-2. Öppna Bluetooth-inställningar på din dator
-3. Para ihop med "Touchpad"
-4. Touchpaden fungerar nu som en fristående mus
+1. Power on the device (USB-C or LiPo)
+2. Open Bluetooth settings on your computer
+3. Pair with "Touchpad"
+4. The touchpad now works as a standalone mouse
 
-### Gester
+### Gestures
 
-| Gest | Funktion |
+| Gesture | Function |
 |---|---|
-| Ett finger — dra | Musrörelse |
-| Ett finger — tryck | Vänsterklick |
-| Två fingrar — tryck | Högerklick |
-| Håll nedtryckt | Klicka-och-dra |
-| Två fingrar — dra vertikalt | Scroll vertikalt |
-| Två fingrar — dra horisontellt | Scroll horisontellt |
+| One finger — drag | Mouse movement |
+| One finger — tap | Left click |
+| Two fingers — tap | Right click |
+| Press and hold | Click and drag |
+| Two fingers — drag vertically | Vertical scroll |
+| Two fingers — drag horizontally | Horizontal scroll |
 
-## Felsökning
+## Troubleshooting
 
-Avkommentera loggnings-raderna i `touchpad.conf`:
+Uncomment the logging lines in `touchpad.conf`:
 
 ```ini
 CONFIG_LOG=y
@@ -93,33 +93,33 @@ CONFIG_INPUT_LOG_LEVEL_DBG=y
 CONFIG_I2C_LOG_LEVEL_DBG=y
 ```
 
-Bygg om, flasha, och koppla in via USB. Läs loggar med:
+Rebuild, flash, and connect via USB. Read logs with:
 
 ```bash
-# Ställ in west runner om det behövs
-west espressif monitor  # eller
+# Set west runner if needed
+west espressif monitor  # or
 screen /dev/ttyACM0 115200
 ```
 
-## Justering
+## Tuning
 
-Redigera `touchpad.overlay` för att:
+Edit `touchpad.overlay` to:
 
-- **Byta axlar:** Avkommentera `switch-xy;` om touchpaden är roterad 90°
-- **Invertera riktning:** Använd `flip-x;` / `flip-y;`
-- **Ändra RDY-pin:** Byt `rdy-gpios` till rätt GPIO om du kopplar annorlunda
+- **Swap axes:** Uncomment `switch-xy;` if the touchpad is rotated 90°
+- **Invert direction:** Use `flip-x;` / `flip-y;`
+- **Change RDY pin:** Change `rdy-gpios` to the correct GPIO if wired differently
 
-## Filstruktur
+## File Structure
 
 ```
 ├── .github/workflows/build.yml     # GitHub Actions CI
-├── build.yaml                       # ZMK build-matris
+├── build.yaml                       # ZMK build matrix
 ├── config/
-│   ├── west.yml                     # West manifest (ZMK + azoteq-modul)
+│   ├── west.yml                     # West manifest (ZMK + azoteq module)
 │   └── boards/shields/touchpad/
-│       ├── Kconfig.shield           # Shield-registrering
-│       ├── Kconfig.defconfig        # Shield-defaults
-│       ├── touchpad.overlay         # Device tree (pinnar, I2C, sensor)
-│       ├── touchpad.conf            # Kconfig (drivrutiner, BLE, etc.)
-│       └── touchpad.keymap          # Minimal keymap (inga tangenter)
+│       ├── Kconfig.shield           # Shield registration
+│       ├── Kconfig.defconfig        # Shield defaults
+│       ├── touchpad.overlay         # Device tree (pins, I2C, sensor)
+│       ├── touchpad.conf            # Kconfig (drivers, BLE, etc.)
+│       └── touchpad.keymap          # Minimal keymap (no keys)
 ```

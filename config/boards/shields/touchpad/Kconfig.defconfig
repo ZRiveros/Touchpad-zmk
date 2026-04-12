@@ -1,0 +1,15 @@
+if SHIELD_TOUCHPAD
+
+config ZMK_KEYBOARD_NAME
+    default "Touchpad"
+
+config ZMK_USB
+    default y
+
+config ZMK_BLE
+    default y
+
+config USB_DEVICE_PRODUCT
+    default "Touchpad"
+
+endif

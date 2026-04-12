@@ -1,0 +1,17 @@
+/*
+ * Minimal keymap för en touchpad-only enhet.
+ * Ingen riktig tangent finns — mock kscan med en dummy-binding.
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/ {
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            bindings = <&none>;
+        };
+    };
+};
