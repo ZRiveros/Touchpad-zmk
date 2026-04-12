@@ -1,17 +1,21 @@
 # Standalone BLE Touchpad — ZMK Firmware
 
-Standalone Bluetooth touchpad using HolyKeebs TPS43 + NRF52840 SuperMini.
-Works as a separate BLE device, **not** connected to Aurora Sofle v2.
+Standalone Bluetooth touchpad using a [HolyKeebs TPS43 kit](https://holykeebs.com/products/touchpad-module) and an NRF52840 SuperMini.
+Advertises as a separate BLE pointing device — completely independent from any split keyboard (e.g. Aurora Sofle v2).
+
+Uses the [suchobits fork](https://github.com/suchobits/zmk-driver-azoteq-iqs5xx) of the Azoteq IQS5xx ZMK driver, which adds **I2C polling fallback** so no RDY pin is needed.
 
 ## Hardware
 
 | Component | Description |
 |---|---|
 | NRF52840 SuperMini | nice!nano v2-compatible MCU |
-| HolyKeebs TPS43 kit | Azoteq IQS5xx touchpad + adapter PCB |
-| LiPo battery | Optional, for wireless operation |
+| [HolyKeebs TPS43 kit](https://holykeebs.com/products/touchpad-module) | Azoteq IQS5xx touchpad + adapter PCB + FFC cable + 3D-printed mount |
+| LiPo battery | Optional — for wireless operation. Can also run via USB-C |
 
-## Wiring Diagram
+## Wiring
+
+Follow the standard [HolyKeebs touchpad guide](https://docs.holykeebs.com/guides/touchpad-module/) — solder the adapter PCB onto the SuperMini and connect the FFC cable. Only **4 signals** are needed:
 
 ```
 TPS43 adapter PCB         NRF52840 SuperMini
@@ -20,25 +24,11 @@ VCC  ──────────────────►  VCC  (3.3V)
 GND  ──────────────────►  GND
 SDA  ──────────────────►  D2   (P0.17)
 SCL  ──────────────────►  D3   (P0.20)
-RDY  ──────────────────►  D4   (P0.22)   ← NOTE: Required!
 ```
 
-> **Important:** You need **5 wires**, not 4! The RDY pin (Data Ready) is
-> mandatory — the driver uses it as an interrupt to know
-> when new data is available from the touchpad.
+The adapter PCB routes VCC, GND, SDA and SCL from the FFC cable to the Pro Micro header. The driver polls the sensor over I2C — no extra RDY or RESET wires required.
 
-### Optional: RESET
-
-If you want to connect the touchpad's RESET pin, wire it to **D5 (P0.24)**
-and uncomment the `reset-gpios` line in `touchpad.overlay`.
-
-### Using the Adapter PCB
-
-The HolyKeebs adapter PCB normally sits on the Pro Micro header via
-the FFC cable. The 4 solder points on the adapter provide the signals
-that map to the Pro Micro pins. Verify which pins the adapter routes
-SDA, SCL, and RDY to — they should match D2, D3, and one of the
-adjacent pins. Otherwise, you can solder directly from the FFC breakout to the MCU.
+> **Optional:** If you want interrupt-driven mode (lower latency, lower power), you can wire the RDY pin from the FFC connector to a free GPIO and uncomment `rdy-gpios` in `touchpad.overlay`.
 
 ## Building Firmware
 
@@ -107,7 +97,14 @@ Edit `touchpad.overlay` to:
 
 - **Swap axes:** Uncomment `switch-xy;` if the touchpad is rotated 90°
 - **Invert direction:** Use `flip-x;` / `flip-y;`
-- **Change RDY pin:** Change `rdy-gpios` to the correct GPIO if wired differently
+- **Enable interrupt mode:** If you wire RDY, uncomment `rdy-gpios` and set correct GPIO
+
+## Credits
+
+- [AYM1607/zmk-driver-azoteq-iqs5xx](https://github.com/AYM1607/zmk-driver-azoteq-iqs5xx) — original ZMK driver
+- [suchobits fork](https://github.com/suchobits/zmk-driver-azoteq-iqs5xx) — polling fallback (no RDY pin needed)
+- [HolyKeebs](https://holykeebs.com/) — TPS43 touchpad kit and adapter PCB
+- [HolyKeebs touchpad guide](https://docs.holykeebs.com/guides/touchpad-module/) — assembly instructions
 
 ## File Structure
 
