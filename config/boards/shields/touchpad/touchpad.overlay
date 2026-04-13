@@ -23,7 +23,7 @@
         compatible = "zmk,kscan-mock";
         columns = <1>;
         rows = <1>;
-        events = <0>;
+        events = <0 0>;
         exit-after = <0>;
     };
 
