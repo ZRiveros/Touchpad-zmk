@@ -24,7 +24,7 @@
         columns = <1>;
         rows = <1>;
         events = <0 0>;
-        exit-after = <0>;
+        exit-after;
     };
 
     /* Input-lyssnare som kopplar touchpad-data till ZMK:s HID-mouse */
