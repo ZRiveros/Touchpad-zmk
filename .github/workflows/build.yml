@@ -7,19 +7,4 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build firmware
-        uses: zmkfirmware/zmk-build-firmware@main
-        with:
-          config_path: config
-
-      - name: Upload firmware artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: touchpad-firmware
-          path: build/artifacts/*.uf2
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
