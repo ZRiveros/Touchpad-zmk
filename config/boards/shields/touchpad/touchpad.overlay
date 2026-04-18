@@ -1,40 +1,38 @@
 /*
- * Standalone BLE Touchpad — HolyKeebs TPS43 + NRF52840 SuperMini
+ * HolyKeebs TPS43 touchpad + Nice!Nano (NRF52840)
  *
- * Wiring via adapter PCB (4 pins: standard HolyKeebs-guide):
- *
- *   TPS43 adapter PCB    NRF52840 SuperMini (Pro Micro pinout)
- *   ─────────────────    ─────────────────────────────────────
- *   VCC  ─────────────►  VCC  (3.3V)
- *   GND  ─────────────►  GND
- *   SDA  ─────────────►  D2   (P0.17)
- *   SCL  ─────────────►  D3   (P0.20)
- *
- * Drivrutinen (suchobits fork) pollar via I2C — ingen RDY-pin krävs.
+ * Wiring (4 pins via HolyKeebs adapter PCB):
+ *   VCC → 3.3V    GND → GND
+ *   SDA → D2 (P0.17)    SCL → D3 (P0.20)
  */
+
+#include <dt-bindings/zmk/matrix_transform.h>
 
 / {
     chosen {
-        zmk,kscan = &mock_kscan;
+        zmk,kscan = &kscan_direct;
+        zmk,matrix-transform = &default_transform;
     };
 
-    /* Dummy kscan – ingen tangent-matris behövs */
-    mock_kscan: kscan {
-        compatible = "zmk,kscan-mock";
+    kscan_direct: kscan_direct {
+        compatible = "zmk,kscan-gpio-direct";
+        wakeup-source;
+        input-gpios = <&gpio0 9 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+    };
+
+    default_transform: keymap_transform_0 {
+        compatible = "zmk,matrix-transform";
         columns = <1>;
         rows = <1>;
-        events = <0 0>;
-        exit-after;
+        map = < RC(0,0) >;
     };
 
-    /* TEMP DISABLED — input listener needs the tps43 node below */
-    /* touchpad_listener: touchpad_listener {
+    tps43_input: tps43_input {
         compatible = "zmk,input-listener";
         device = <&tps43>;
-    }; */
+    };
 };
 
-/* TEMP DISABLED — I2C touchpad for debugging BLE
 &pro_micro_i2c {
     status = "okay";
 
@@ -42,15 +40,17 @@
         status = "okay";
         compatible = "azoteq,iqs5xx";
         reg = <0x74>;
+
         one-finger-tap;
-        two-finger-tap;
         press-and-hold;
         press-and-hold-time = <250>;
+        two-finger-tap;
+
         scroll;
         natural-scroll-y;
         natural-scroll-x;
+
         bottom-beta = <5>;
         stationary-threshold = <5>;
     };
 };
-*/
