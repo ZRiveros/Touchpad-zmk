@@ -27,13 +27,14 @@
         exit-after;
     };
 
-    /* Input-lyssnare som kopplar touchpad-data till ZMK:s HID-mouse */
-    touchpad_listener: touchpad_listener {
+    /* TEMP DISABLED — input listener needs the tps43 node below */
+    /* touchpad_listener: touchpad_listener {
         compatible = "zmk,input-listener";
         device = <&tps43>;
-    };
+    }; */
 };
 
+/* TEMP DISABLED — I2C touchpad for debugging BLE
 &pro_micro_i2c {
     status = "okay";
 
@@ -41,34 +42,15 @@
         status = "okay";
         compatible = "azoteq,iqs5xx";
         reg = <0x74>;
-
-        /* Ingen RDY-pin — drivrutinen faller tillbaka på polling */
-        /* Om du kopplar RDY kan du lägga till: */
-        /* rdy-gpios = <&gpio0 22 GPIO_ACTIVE_HIGH>; */
-
-        /* RESET = Valfri, avkommentera om du kopplar RESET */
-        /* reset-gpios = <&gpio0 24 GPIO_ACTIVE_LOW>; */
-
-        /* Gester */
         one-finger-tap;
         two-finger-tap;
         press-and-hold;
         press-and-hold-time = <250>;
-
-        /* Scrollning */
         scroll;
         natural-scroll-y;
         natural-scroll-x;
-
-        /* Finjustering */
         bottom-beta = <5>;
         stationary-threshold = <5>;
-
-        /*
-         * Axel-konfiguration — justera efter orientering:
-         *   switch-xy;    ← byt X/Y om touchpaden är roterad 90°
-         *   flip-x;       ← invertera X
-         *   flip-y;       ← invertera Y
-         */
     };
 };
+*/
