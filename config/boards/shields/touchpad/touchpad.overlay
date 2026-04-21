@@ -31,11 +31,14 @@
         compatible = "zmk,input-listener";
         device = <&tps43>;
     };
-};
 
-/* Force VCC load switch ON — P0.13 active-low on Nice!Nano clones */
-&{/EXT_POWER} {
-    status = "okay";
+    /* Override the ext power node to default ON */
+    /delete-node/ EXT_POWER;
+    EXT_POWER {
+        compatible = "zmk,ext-power-generic";
+        control-gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+        init-on;
+    };
 };
 
 &pro_micro_i2c {
