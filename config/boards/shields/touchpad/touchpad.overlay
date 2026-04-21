@@ -34,9 +34,8 @@
 };
 
 /* Force VCC load switch ON — P0.13 active-low on Nice!Nano clones */
-&EXT_POWER {
+&{/EXT_POWER} {
     status = "okay";
-    init-on;
 };
 
 &pro_micro_i2c {
