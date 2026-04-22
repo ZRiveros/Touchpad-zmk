@@ -1,9 +1,10 @@
 /*
- * HolyKeebs TPS43 touchpad + Nice!Nano (NRF52840)
- *
- * Wiring (4 pins via HolyKeebs adapter PCB):
- *   VCC → 3.3V    GND → GND
- *   SDA → D2 (P0.17)    SCL → D3 (P0.20)
+ * Standalone BLE Touchpad — TPS43 + NRF52840 SuperMini
+ * Wiring:
+ *   VCC → 3.3V
+ *   GND → GND
+ *   SDA → D2 (P0.17)
+ *   SCL → D3 (P0.20)
  */
 
 #include <dt-bindings/zmk/matrix_transform.h>
@@ -14,6 +15,7 @@
         zmk,matrix-transform = &default_transform;
     };
 
+    /* Dummy kscan (krävs av ZMK) */
     kscan_direct: kscan_direct {
         compatible = "zmk,kscan-gpio-direct";
         wakeup-source;
@@ -27,36 +29,57 @@
         map = < RC(0,0) >;
     };
 
+    /* Koppla touchpad → ZMK input */
     tps43_input: tps43_input {
         compatible = "zmk,input-listener";
         device = <&tps43>;
     };
+};
 
-    /* Override the ext power node to default ON */
-    /delete-node/ EXT_POWER;
-    EXT_POWER {
-        compatible = "zmk,ext-power-generic";
-        control-gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+/* 🔥 KRITISK DEL — definierar rätt pins */
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 17)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 20)>;
+            low-power-enable;
+        };
     };
 };
 
-&pro_micro_i2c {
+/* 🔥 RÄTT I2C (inte pro_micro_i2c!) */
+&i2c0 {
     status = "okay";
+    clock-frequency = <I2C_BITRATE_FAST>;
+
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
 
     tps43: iqs5xx@74 {
-        status = "okay";
         compatible = "azoteq,iqs5xx";
         reg = <0x74>;
+        status = "okay";
 
+        /* Gester */
         one-finger-tap;
+        two-finger-tap;
         press-and-hold;
         press-and-hold-time = <250>;
-        two-finger-tap;
 
+        /* Scroll */
         scroll;
         natural-scroll-y;
         natural-scroll-x;
 
+        /* Tuning */
         bottom-beta = <5>;
         stationary-threshold = <5>;
     };
